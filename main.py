@@ -31,6 +31,9 @@ def create_app(config=config[config_name]):
     db.app = app
     migrate.init_app(app, db)
 
+    # import models
+    import api.models
+    # import views
     import api.views
 
     return app
