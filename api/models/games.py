@@ -1,4 +1,7 @@
+from email.policy import default
 import uuid
+
+from sqlalchemy import null
 from main import db
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 
@@ -13,6 +16,8 @@ class Game(db.Model):
     available_languages = db.Column(ARRAY(db.String), nullable=False)
     word_count = db.Column(db.Integer, nullable=False)
     release_date = db.Column(db.DateTime)
+
+    deleted = db.Column(db.Boolean, nullable=False, default=False)
 
     def __repr__(self):
         return f'<Game {self.name}>'
