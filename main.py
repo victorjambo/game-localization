@@ -12,7 +12,9 @@ from config import config
 
 
 config_name = getenv('FLASK_ENV', default='production')
-api = Api()
+api_prefix = getenv('API_BASE_URL_V1', default='/api/v1')
+rest_api = Api(prefix=api_prefix, version='1.0', title='Game API',
+               description='Game localization API',)
 db = SQLAlchemy()
 migrate = Migrate()
 
@@ -23,10 +25,12 @@ def create_app(config=config[config_name]):
     CORS(app)
 
     # Lazy initialization with the factory pattern
-    api.init_app(app)
+    rest_api.init_app(app)
     app.config.from_object(config)
     db.init_app(app)
     db.app = app
     migrate.init_app(app, db)
+
+    import api.views
 
     return app

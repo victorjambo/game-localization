@@ -15,8 +15,8 @@ app = create_app(config[config_name])
 
 
 @app.route('/healthcheck')
-def index():
-    """Process / routes and returns 'Welcome to the api' as json."""
+def healthcheck():
+    """Used to check health status of the app"""
     return jsonify(dict(status='OK'))
 
 
