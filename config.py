@@ -29,7 +29,7 @@ class TestingConfig(Config):
     """Test Config"""
 
     TESTING = True
-    DATABASE_URI = getenv(
+    SQLALCHEMY_DATABASE_URI = getenv(
         'TEST_DATABASE_URI', default='postgresql://localhost/game_test')
 
 
