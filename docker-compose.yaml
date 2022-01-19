@@ -1,0 +1,34 @@
+version: "3.9"
+
+x-web-variables: &web-variables
+  DATABASE_URI: postgresql+psycopg2://postgres:postgres@postgres
+
+x-service-volumes: &service-volumes
+  - ./migrations:/app/migrations
+
+x-pg-variables: &pg-variables
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+
+services:
+  web:
+    build: .
+    environment: *web-variables
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    networks:
+      - default
+    volumes: *service-volumes
+    restart: always
+
+  postgres:
+    image: postgres:14.1
+    environment: *pg-variables
+    ports:
+      - 5432:5432
+    networks:
+      - default
