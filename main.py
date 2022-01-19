@@ -14,7 +14,7 @@ from config import config
 config_name = getenv('FLASK_ENV', default='production')
 api_prefix = getenv('API_BASE_URL_V1', default='/api/v1')
 rest_api = Api(prefix=api_prefix, version='1.0', title='Game API',
-               description='Game localization API',)
+               description='Game localization API', doc="/docs")
 db = SQLAlchemy()
 migrate = Migrate()
 
