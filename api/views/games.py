@@ -1,60 +1,71 @@
 from flask_restx import Resource
 from main import rest_api
-from flask import jsonify
+from flask import jsonify, request
 
+from api.models import Game
+from api.schemas.games import GameSchema
+
+from main import db
 
 @rest_api.route('/games')
 class GamesResource(Resource):
     def get(self):
         """Fetch All Games"""
-        return jsonify(dict(games=[
-            {
-                "id": "379d6e11-7024-1893-a209-84562b07b333",  # UUID4
-                "name": "Final Fantasy",  # unique, not empty string
-                # non-empty array of str
-                "available_languages": ["en", "es", "de", "it", "fr", "ko"],
-                "word_count": 82741003,  # positive int
-                "release_date": "2022-01-11T12:36:38+00:00",  # null or ISO 8601 - always UTC
-                "created_at": "2021-01-11T12:36:38+00:02"  # ISO 8601 - keeps client timezone
-            }
-        ]))
+
+        games = Game.query.all()
+
+        game_schema = GameSchema(many=True)
+
+        data = game_schema.dump(games)
+
+        return jsonify(games=data)
 
     def post(self):
         """Create New Game"""
-        return {
-            "id": "312e8e30-7624-4923-a805-84562b07b738",
-            "name": "Diablo 112",
-            "available_languages": ["en", "de", "ru", "it", "ko", "pt"],
-            "word_count": 71701829,
-            "release_date": "2022-01-11T12:36:38+00:00",
-            "created_at": "2021-01-11T12:36:38+00:02"
-        }
+        request_data = request.get_json()
+        game_schema = GameSchema()
+        game_data = game_schema.load(request_data)
+        game = Game(**game_data)
+
+        db.session.add(game)
+        db.session.commit()
+
+        return game_schema.dump(game), 201
 
 
 @rest_api.route('/games/<string:game_id>')
 class SingleGameResource(Resource):
     def get(self, game_id):
         """Fetch Single Game"""
-        return {
-            "id": game_id,
-            "name": "Diablo 112",
-            "available_languages": ["en", "de", "ru", "it", "ko", "pt"],
-            "word_count": 71701829,
-            "release_date": "2022-01-11T12:36:38+00:00",
-            "created_at": "2021-01-11T12:36:38+00:02"
-        }
+
+        game = Game.query.filter_by(id=game_id).first()
+
+        game_schema = GameSchema()
+
+        return game_schema.dump(game)
 
     def put(self, game_id):
         """Update Game"""
-        return {
-            "id": game_id,
-            "name": "Super Mario World",
-            "available_languages": ["en", "es", "de", "it", "fr", "ko"],
-            "word_count": 91701298,
-            "release_date": "2022-01-11T12:36:38+00:00",
-            "created_at": "2021-01-11T12:36:38+00:02"
-        }
+        request_data = request.get_json()
+        game_schema = GameSchema()
+        game_data = game_schema.load(request_data)
+        game = Game.query.filter_by(id=game_id).first()
+        
+        for field, value in game_data.items():
+            setattr(game, field, value)
+
+        db.session.add(game)
+        db.session.commit()
+        
+        return game_schema.dump(game)
 
     def delete(self, game_id):
-        """Delete Game"""
-        return jsonify(dict(success="OK"))
+        """Soft Delete Game"""
+        game = Game.query.filter_by(id=game_id).first()
+        
+        setattr(game, 'deleted', True)
+
+        db.session.add(game)
+        db.session.commit()
+
+        return None, 204
