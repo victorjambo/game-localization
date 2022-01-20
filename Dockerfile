@@ -7,12 +7,9 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 COPY ./requirements.txt /app/requirements.txt
-RUN \
- apk add --no-cache postgresql-libs && \
- apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev && \
- python3 -m pip install -r requirements.txt --no-cache-dir && \
- apk --purge del .build-deps
+
+RUN pip install -r requirements.txt
+
 COPY . /app
-EXPOSE 5000
-RUN ["chmod", "+x", "/app/docker-entrypoint.sh"]
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
+
+CMD ["flask", "run", "--host=0.0.0.0"]
