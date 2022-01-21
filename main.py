@@ -4,11 +4,12 @@ from os import getenv
 
 from flask_cors import CORS
 from flask_restx import Api
-from flask import Flask
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
 from config import config
+from api.utils.validators import ValidationError
 
 
 config_name = getenv('FLASK_ENV', default='production')
@@ -37,3 +38,9 @@ def create_app(config=config[config_name]):
     import api.views
 
     return app
+
+@rest_api.errorhandler(ValidationError)
+def handle_exception(error):
+    """Error handler called when a ValidationError Exception is raised"""
+
+    return error.to_dict(), error.status_code

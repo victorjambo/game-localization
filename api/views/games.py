@@ -5,14 +5,14 @@ from flask import jsonify, request
 from api.models import Game
 from api.schemas.games import GameSchema
 
-from main import db
+
 
 @rest_api.route('/games')
 class GamesResource(Resource):
     def get(self):
         """Fetch All Games"""
 
-        games = Game.query.all()
+        games = Game.query_(request.args)
 
         game_schema = GameSchema(many=True)
 
@@ -23,12 +23,14 @@ class GamesResource(Resource):
     def post(self):
         """Create New Game"""
         request_data = request.get_json()
+
         game_schema = GameSchema()
         game_data = game_schema.load(request_data)
-        game = Game(**game_data)
 
-        db.session.add(game)
-        db.session.commit()
+        Game.get_by_name(game_data['name'])
+
+        game = Game(**game_data)
+        game.save()
 
         return game_schema.dump(game), 201
 
@@ -38,7 +40,7 @@ class SingleGameResource(Resource):
     def get(self, game_id):
         """Fetch Single Game"""
 
-        game = Game.query.filter_by(id=game_id).first()
+        game = Game.get_or_404(game_id)
 
         game_schema = GameSchema()
 
@@ -46,26 +48,22 @@ class SingleGameResource(Resource):
 
     def put(self, game_id):
         """Update Game"""
+        game = Game.get_or_404(game_id)
+
         request_data = request.get_json()
         game_schema = GameSchema()
         game_data = game_schema.load(request_data)
-        game = Game.query.filter_by(id=game_id).first()
-        
-        for field, value in game_data.items():
-            setattr(game, field, value)
 
-        db.session.add(game)
-        db.session.commit()
-        
+        game.update_(**game_data)
+
         return game_schema.dump(game)
 
     def delete(self, game_id):
         """Soft Delete Game"""
-        game = Game.query.filter_by(id=game_id).first()
-        
-        setattr(game, 'deleted', True)
+        game = Game.get_or_404(game_id)
 
-        db.session.add(game)
-        db.session.commit()
+        game.update_(**{
+            "deleted": True
+        })
 
         return None, 204
