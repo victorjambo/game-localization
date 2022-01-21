@@ -1,4 +1,5 @@
 ### Game Localization
+Frontend Repo 👉 https://github.com/victorjambo/game-localization-web
 
 ## Dev setup (Docker)
 __requirements__ Ensure you have docker installed
