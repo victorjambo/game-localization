@@ -1,8 +1,17 @@
 build:
-	docker build --force-rm $(options) -t game-localization:latest .
+	docker-compose build
 
-compose-start:
-	docker-compose up --remove-orphans $(options)
+start:
+	docker-compose up web
 
-compose-stop:
-	docker-compose down --remove-orphans $(options)
+build-test:
+	docker-compose build test
+
+test:
+	docker-compose run test
+
+migrate:
+	docker compose run web flask db upgrade
+
+volume:
+	docker volume create db_data

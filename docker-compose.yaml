@@ -47,7 +47,7 @@ services:
     image: postgres:14.1
     environment: *pg-test-variables
     ports:
-      - 5432:5432
+      - 5405:5432
     volumes:
       - /var/lib/postgresql/data
 
