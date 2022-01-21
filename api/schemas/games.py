@@ -1,5 +1,6 @@
 """Model Schemas"""
 from marshmallow import Schema, fields
+from api.utils.validators import ValidationError
 
 
 class GameSchema(Schema):
@@ -13,3 +14,16 @@ class GameSchema(Schema):
     word_count = fields.Integer(required=True)
     release_date = fields.DateTime(required=True)
     available_languages = fields.List(fields.String(), required=True)
+
+    def handle_error(self, exc, data, **kwargs):
+        """Log and raise our custom exception when (de)serialization fails."""
+        raise ValidationError({
+            "message": "An error occurred with input: {0}".format(data)
+        }, 400)
+
+class UpdateGameSchema(GameSchema):
+
+    name = fields.String()
+    word_count = fields.Integer()
+    release_date = fields.DateTime()
+    available_languages = fields.List(fields.String())

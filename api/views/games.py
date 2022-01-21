@@ -3,8 +3,8 @@ from main import rest_api
 from flask import jsonify, request
 
 from api.models import Game
-from api.schemas.games import GameSchema
-
+from api.schemas.games import GameSchema, UpdateGameSchema
+from api.utils.validators import validate_id
 
 
 @rest_api.route('/games')
@@ -37,6 +37,7 @@ class GamesResource(Resource):
 
 @rest_api.route('/games/<string:game_id>')
 class SingleGameResource(Resource):
+    @validate_id
     def get(self, game_id):
         """Fetch Single Game"""
 
@@ -46,18 +47,20 @@ class SingleGameResource(Resource):
 
         return game_schema.dump(game)
 
+    @validate_id
     def put(self, game_id):
         """Update Game"""
         game = Game.get_or_404(game_id)
 
         request_data = request.get_json()
-        game_schema = GameSchema()
+        game_schema = UpdateGameSchema()
         game_data = game_schema.load(request_data)
 
         game.update_(**game_data)
 
         return game_schema.dump(game)
 
+    @validate_id
     def delete(self, game_id):
         """Soft Delete Game"""
         game = Game.get_or_404(game_id)
