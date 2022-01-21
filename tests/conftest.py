@@ -46,3 +46,7 @@ def init_db(app):
 @pytest.fixture(scope="module")
 def new_game(app):
     return Game(**games_data[0])
+
+@pytest.fixture(scope="module")
+def new_game_2(app):
+    return Game(**games_data[1])

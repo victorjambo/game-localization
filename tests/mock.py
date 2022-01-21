@@ -18,3 +18,10 @@ games_data = [
         "release_date": "2022-01-11T12:36:38+00:00"
     }
 ]
+
+single_game = {
+    "name": "Minecraft",
+    "available_languages": ["es"],
+    "word_count": 123,
+    "release_date": "2022-01-11T12:36:38+00:00"
+}
